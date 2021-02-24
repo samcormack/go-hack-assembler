@@ -1,35 +1,48 @@
 package main
 
 import (
-	// "bufio"
+	"bufio"
 	"os"
 	"log"
-	"fmt"
+	s "strings"
+	// "fmt"
 	"assembler/parser"
+	"assembler/code"
 )
 
-var ADD string = "/home/sam/Dropbox/Sam/CS/Core CS/10. Nand2Tetris/nand2tetris/projects/06/add/Add.asm"
-var MAX string = "/home/sam/Dropbox/Sam/CS/Core CS/10. Nand2Tetris/nand2tetris/projects/06/max/Max.asm"
-var MAXL string = "/home/sam/Dropbox/Sam/CS/Core CS/10. Nand2Tetris/nand2tetris/projects/06/max/MaxL.asm"
+var ADD string = "./examples/Add.asm"
+var MAX string = "./examples/Max.asm"
+var MAXL string = "./examples/MaxL.asm"
 
 func main() {
-	infile, err := os.Open(MAXL)
+	fname := ADD
+	if len(os.Args) >1 {
+		fname = os.Args[1]
+	}
+
+	infile, err := os.Open(fname)
 	check(err)
 	defer infile.Close()
 
+	outfile, err := os.Create(s.TrimSuffix(fname, ".asm")+".hack")
+	check(err)
+	defer outfile.Close()
+
+	writer := bufio.NewWriter(outfile)
+	defer writer.Flush()
+
 	p := parser.NewParser(infile)
+	var cmd string
 	for p.HasMoreCommands() {
 		p.Advance()
 		switch p.CommandType() {
 		case parser.A_COMMAND:
-			fmt.Println(p.CommandType(), ": ",p.Symbol())
+			cmd = code.TranslateA(p.Symbol())
 		case parser.C_COMMAND:
-			fmt.Println(p.CommandType(), ": ",p.Dest(), ", ", p.Comp(), ", ", p.Jump())
+			cmd = code.TranslateC(p.Dest(), p.Comp(), p.Jump())
 		}
-		
-	}
-	
-	
+		writer.WriteString(cmd + "\n")
+	}	
 }
 
 func check(err error) {
