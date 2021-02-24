@@ -1,13 +1,12 @@
 package main
 
 import (
-	"bufio"
-	"os"
-	"log"
-	s "strings"
-	// "fmt"
-	"assembler/parser"
 	"assembler/code"
+	"assembler/parser"
+	"bufio"
+	"log"
+	"os"
+	s "strings"
 )
 
 var ADD string = "./examples/Add.asm"
@@ -16,7 +15,7 @@ var MAXL string = "./examples/MaxL.asm"
 
 func main() {
 	fname := ADD
-	if len(os.Args) >1 {
+	if len(os.Args) > 1 {
 		fname = os.Args[1]
 	}
 
@@ -24,7 +23,7 @@ func main() {
 	check(err)
 	defer infile.Close()
 
-	outfile, err := os.Create(s.TrimSuffix(fname, ".asm")+".hack")
+	outfile, err := os.Create(s.TrimSuffix(fname, ".asm") + ".hack")
 	check(err)
 	defer outfile.Close()
 
@@ -42,7 +41,7 @@ func main() {
 			cmd = code.TranslateC(p.Dest(), p.Comp(), p.Jump())
 		}
 		writer.WriteString(cmd + "\n")
-	}	
+	}
 }
 
 func check(err error) {
