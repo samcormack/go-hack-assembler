@@ -8,7 +8,6 @@ import (
 	"log"
 	"os"
 	s "strings"
-	"fmt"
 )
 
 var ADD string = "./examples/Add.asm"
@@ -43,7 +42,7 @@ func main() {
 			symbolTable.AddEntry(p.Symbol(), p.LineNo)
 		}
 	}
-	fmt.Println(symbolTable)
+
 	// Parse input and write to output
 	p.Reset()
 	var cmd string
