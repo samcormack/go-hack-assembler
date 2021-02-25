@@ -32,6 +32,7 @@ func main() {
 	writer := bufio.NewWriter(outfile)
 	defer writer.Flush()
 
+	// Create symbol table
 	symbolTable := symbol.NewSymbolTable()
 	
 	// First pass: find labels and add them to symbol table
