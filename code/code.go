@@ -83,7 +83,11 @@ func TranslateC(d, c, j string) string {
 }
 
 // Translate an A command to machine code
-func TranslateA(address string) string {
-	address_dec, _ := strconv.ParseInt(address, 10, 64)
-	return zeroPad(strconv.FormatInt(address_dec, 2), 16)
+func TranslateA(address int64) string {
+	return zeroPad(strconv.FormatInt(address, 2), 16)
 }
+
+// func TranslateA(address string) string {
+// 	address_dec, _ := strconv.ParseInt(address, 10, 64)
+// 	return zeroPad(strconv.FormatInt(address_dec, 2), 16)
+// }

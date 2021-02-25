@@ -1,10 +1,13 @@
 package parser
 
 import (
+	"assembler/symbol"
 	"bufio"
 	"fmt"
 	"os"
 	s "strings"
+	"strconv"
+	"log"
 )
 
 // Command type constants
@@ -19,14 +22,27 @@ type Parser struct {
 	file *os.File
 	scanner *bufio.Scanner
 	Command string
+	LineNo int64
+	nextAddress int64
 }
 
 func NewParser(file *os.File) *Parser {
 	scanner := bufio.NewScanner(file)
-	p := Parser{file: file, scanner: scanner}
+	p := Parser{file: file, scanner: scanner, LineNo: 0, nextAddress: 16}
 	return &p
 }
 
+// Reset parser to start of file
+func (p *Parser) Reset() {
+	_,err := p.file.Seek(0,0)
+	if err != nil {
+		log.Fatal(err)
+	}
+	p.scanner = bufio.NewScanner(p.file)
+	p.Command = ""
+	p.LineNo = 0
+	p.nextAddress = 16
+}
 // Print contents of input file
 func (p *Parser) Print() {
 	for p.scanner.Scan() {
@@ -50,6 +66,9 @@ func (p *Parser) HasMoreCommands() bool {
 func (p *Parser) Advance() {
 	subs := s.SplitN(p.scanner.Text(), "//", 2)
 	p.Command = s.TrimSpace(subs[0])
+	if p.CommandType() != L_COMMAND {
+		p.LineNo++
+	}
 }
 
 //Return command type of parser's Command
@@ -75,6 +94,20 @@ func (p *Parser) Symbol() string {
 		panic("Tried to access symbol of C command")
 	}
 	return ""
+}
+
+// Return address of an A command
+func (p *Parser) Address(st *symbol.SymbolTable) int64 {
+	sym := p.Symbol()
+	address, err := strconv.ParseInt(sym, 10, 64)
+	if err == nil {
+		return address
+	} 
+	if !st.Contains(sym) {
+		st.AddEntry(sym, p.nextAddress)
+		p.nextAddress++
+	}
+	return st.GetAddress(sym)
 }
 
 // Return current dest mnemonic
