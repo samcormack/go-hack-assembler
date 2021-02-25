@@ -7,12 +7,14 @@ import (
 	s "strings"
 )
 
+// Command type constants
 const (
 	A_COMMAND = "A"
 	C_COMMAND = "C"
 	L_COMMAND = "L"
 )
 
+// Object that parses a .asm file
 type Parser struct {
 	file *os.File
 	scanner *bufio.Scanner
@@ -25,12 +27,14 @@ func NewParser(file *os.File) *Parser {
 	return &p
 }
 
+// Print contents of input file
 func (p *Parser) Print() {
 	for p.scanner.Scan() {
 		fmt.Println(p.scanner.Text())
 	}
 }
 
+// Move to next command line in input and return true. Return false if no more commands
 func (p *Parser) HasMoreCommands() bool {
 	for p.scanner.Scan() {
 		line := p.scanner.Text()
@@ -42,11 +46,13 @@ func (p *Parser) HasMoreCommands() bool {
 	return false
 }
 
+// Set Command of parse to current line in input
 func (p *Parser) Advance() {
 	subs := s.SplitN(p.scanner.Text(), "//", 2)
 	p.Command = s.TrimSpace(subs[0])
 }
 
+//Return command type of parser's Command
 func (p *Parser) CommandType() string {
 	switch {
 	case s.HasPrefix(p.Command, "@"):
@@ -58,6 +64,7 @@ func (p *Parser) CommandType() string {
 	}
 }
 
+// Return symbol of Parser's Command
 func (p *Parser) Symbol() string {
 	switch p.CommandType() {
 	case A_COMMAND:
@@ -70,7 +77,7 @@ func (p *Parser) Symbol() string {
 	return ""
 }
 
-
+// Return current dest mnemonic
 func (p *Parser) Dest() string {
 	subs := s.SplitN(p.Command, "=", 2)
 	if len(subs) == 1 {
@@ -80,6 +87,7 @@ func (p *Parser) Dest() string {
 	
 }
 
+// Return current comp mnemonic
 func (p *Parser) Comp() string {
 	var right string
 	subs := s.SplitN(p.Command, "=", 2)
@@ -92,6 +100,7 @@ func (p *Parser) Comp() string {
 	return s.TrimSpace(subs[0])
 }
 
+// Return current jump mnemonic
 func (p *Parser) Jump() string {
 	subs := s.SplitN(p.Command, ";", 2)
 	if len(subs) == 1 {

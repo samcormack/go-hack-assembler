@@ -69,6 +69,7 @@ func jump(j string) string {
 	return jumpMap[j]
 }
 
+// Left pad string with zeros until it is "length" long
 func zeroPad(num string, length int) string {
 	for len(num) < length {
 		num = "0" + num
@@ -76,10 +77,12 @@ func zeroPad(num string, length int) string {
 	return num
 }
 
+// Translate a C command to machine code
 func TranslateC(d, c, j string) string {
 	return "111" + comp(c) + dest(d) + jump(j)
 }
 
+// Translate an A command to machine code
 func TranslateA(address string) string {
 	address_dec, _ := strconv.ParseInt(address, 10, 64)
 	return zeroPad(strconv.FormatInt(address_dec, 2), 16)
